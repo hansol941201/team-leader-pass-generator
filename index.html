@@ -11,6 +11,10 @@
     <!-- Google Fonts Inter & Noto Sans KR -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        .mail-reassurance { display: block; padding: 12px; margin-bottom: 8px; border-left: 4px solid #059669; background: #ecfdf5; color: #065f46; font-weight: 700; }
+        .mail-benefit { display: block; padding: 10px; background: #eef2ff; color: #3730a3; font-weight: 700; }
+        .mail-keyword { background: #fef3c7; color: inherit; font-weight: 700; padding: 0 2px; }
+
         body {
             font-family: 'Noto Sans KR', 'Inter', sans-serif;
         }
@@ -121,12 +125,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
             <div class="flex items-center space-x-2">
                 <span class="bg-indigo-600 text-white font-bold px-2 py-0.5 rounded text-[10px] tracking-wide">팀장님 스타일 가이드</span>
-                <span class="text-slate-300 hidden sm:inline">논리 개연성 + 팩트 중심 + 시공사 배려 키워드가 자동으로 반영됩니다.</span>
+                <span class="text-slate-300 hidden sm:inline">협력사 피드백에 답하는 서두 + 고객사 전용 혜택 + 안심 우선 구조가 자동으로 반영됩니다.</span>
             </div>
             <div class="flex items-center space-x-4 text-[11px] text-indigo-300">
                 <span title="60명 = 단순 규모 자랑이 아닌 지원 조직 기반"><i class="fa-solid fa-users text-indigo-400 mr-1"></i>60명 전문인력 = 지원 기반</span>
                 <span title="수주 보장 표현 원천 차단"><i class="fa-solid fa-ban text-red-400 mr-1"></i>수주보장 표현 금지</span>
-                <span title="앱 전환시 데이터 100% 보존 선제 강조"><i class="fa-solid fa-database text-emerald-400 mr-1"></i>앱 전환 데이터 100% 연동</span>
+                <span title="앱 런칭 안내 최상단에 기존 데이터 100% 보존 강조"><i class="fa-solid fa-database text-emerald-400 mr-1"></i>기존 데이터 100% 보존 우선</span>
             </div>
         </div>
     </aside>
@@ -159,11 +163,21 @@
                         <label class="block text-xs font-bold text-slate-700 mb-1">메일 목적</label>
                         <select id="mail-purpose" onchange="handleMailPurposeChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                             <option value="pour">A. POUR 공법 제안 & 홍보 메일 (60명 지원 기반)</option>
-                            <option value="app">B. 앱 전환 안내 & 시공사 불안 해소 (데이터 유지)</option>
+                            <option value="app">B. 파트너스 앱 런칭 & 고객사 전용 혜택 (데이터 보존)</option>
                             <option value="delay">C. 공정 지연 안내 및 협조 요청</option>
                             <option value="reject">D. 시공사 요구사항 부드러운 거절 및 대안 제시</option>
                             <option value="general">E. 일반 협조 요청 및 공지 메일</option>
                         </select>
+                    </div>
+
+                    <div id="app-name-field" class="hidden">
+                        <label for="mail-app-name" class="block text-xs font-bold text-slate-700 mb-1">파트너스 앱 이름</label>
+                        <input type="text" id="mail-app-name" value="POUR 파트너스" placeholder="예: OO 파트너스" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label for="mail-feedback" class="block text-xs font-bold text-slate-700 mb-1">협력사에서 받은 피드백 · 개선 요청 (선택)</label>
+                        <textarea id="mail-feedback" rows="2" placeholder="예: 현장 문서를 더 간편하게 확인하고 싶다는 요청" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm"></textarea>
+                        <p class="mt-1 text-[11px] text-slate-500">입력한 요청을 서두에 반영합니다. 비워 두면 협력사 의견에 대한 감사와 응답 문구를 사용합니다.</p>
                     </div>
 
                     <!-- Empathy Level Toggle -->
@@ -197,7 +211,9 @@
 
                     <div id="app-alert" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-[11px] text-emerald-800 space-y-1">
                         <div class="font-bold flex items-center"><i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i> 시공사 안심 필터 가동</div>
-                        <p>· 신기능 자랑보다 <strong>'기존 데이터 및 업무 내역 100% 보존 및 연동'</strong>을 상단에 먼저 배치합니다.</p>
+                        <p>· <strong>'기존 데이터 및 업무 내역 100% 보존'</strong>을 본문 맨 위에 배치합니다.</p>
+                        <p>· 협력사 피드백에 답하기 위해 준비한 <strong>'고객사만을 위한' 파트너스 앱 런칭</strong>으로 안내합니다.</p>
+                        <p>· 시스템 전환/변경 표현을 긍정적인 런칭 표현으로 정돈하고, <strong>'그대로' · '더 편리하게'</strong>를 강조합니다.</p>
                     </div>
 
                     <!-- Submit Button -->
@@ -510,6 +526,7 @@
             const purpose = document.getElementById('mail-purpose').value;
             const pourAlert = document.getElementById('pour-alert');
             const appAlert = document.getElementById('app-alert');
+            document.getElementById('app-name-field').classList.toggle('hidden', purpose !== 'app');
 
             if (purpose === 'pour') {
                 pourAlert.classList.remove('hidden');
@@ -588,10 +605,46 @@
         }
 
         // Tab 1: Generate Email Logic
+        function positiveMailLanguage(text, appName) {
+            return text
+                .replace(/(?:시스템|앱)\s*(?:전환\s*[/·]\s*변경|전환|변경|개편)/g, () => appName + ' 런칭')
+                .replace(/(?:당사|회사)\s*전용/g, '고객사만을 위한')
+                .replace(/더욱\s*편리하게/g, '더 편리하게');
+        }
+
+        function renderMail(result) {
+            const box = document.getElementById('mail-result-box');
+            box.replaceChildren();
+            result.split('\n').forEach((line, index, lines) => {
+                const row = document.createElement('span');
+                if (line.startsWith('[안심 안내]')) row.className = 'mail-reassurance';
+                if (line.startsWith('[기억하실 한 문장]')) row.className = 'mail-benefit';
+                const parts = line.split(/('(?:그대로|더 편리하게|고객사만을 위한)')/g);
+                parts.forEach((part, partIndex) => {
+                    if (partIndex % 2) {
+                        const mark = document.createElement('mark');
+                        mark.className = 'mail-keyword';
+                        mark.textContent = part;
+                        row.appendChild(mark);
+                    } else row.appendChild(document.createTextNode(part));
+                });
+                box.appendChild(row);
+                if (index < lines.length - 1) box.appendChild(document.createTextNode('\n'));
+            });
+            // Keep copy output independent of visual block spacing.
+            box.dataset.plainText = result;
+        }
+
         function generateMail() {
             const target = document.getElementById('mail-target').value || '현장 소장님 및 관계자 귀하';
             const purpose = document.getElementById('mail-purpose').value;
-            const context = document.getElementById('mail-context').value.trim();
+            const rawAppName = document.getElementById('mail-app-name').value.trim() || 'POUR 파트너스';
+            const appName = /앱$/.test(rawAppName) ? rawAppName : rawAppName + ' 앱';
+            const context = positiveMailLanguage(document.getElementById('mail-context').value.trim(), appName);
+            const feedback = positiveMailLanguage(document.getElementById('mail-feedback').value.trim(), appName);
+            const feedbackIntro = feedback
+                ? '협력사 여러분께서 보내주신 “' + feedback + '” 의견과 개선 요청에 답하기 위해 이번 안내를 준비했습니다. 현장의 목소리가 더 나은 서비스를 만드는 출발점이 되었습니다.'
+                : '협력사 여러분께서 보내주신 소중한 피드백과 개선 요청에 답하기 위해 이번 안내를 준비했습니다. 현장의 목소리에 감사드리며, 고객사에 도움이 되는 지원으로 보답하겠습니다.';
 
             let toneIntro = "언제나 현장에서 최선을 다해 주시는 노고에 깊은 감사드립니다.";
             if (activeTone === 'caring') {
@@ -608,7 +661,9 @@
 안녕하십니까, ${target}.
 ${toneIntro}
 
-금번 당사의 POUR 공법과 관련하여, 단순한 공법 제공을 넘어 현장의 성공적인 적용을 돕는 당사의 체계적인 지원 시스템을 안내해 드리고자 합니다.
+${feedbackIntro}
+
+'고객사만을 위한' POUR 공법 지원으로 현장 적용을 '더 편리하게' 돕겠습니다.
 
 1. 분야별 전문 인력(60명) 기반의 지원 체계
 - 당사의 60명 전문 인력 조직은 단순 규모 확장이 아닌, 기술 검토부터 공법설명회, 맞춤형 컨설팅 및 현장 적용에 이르기까지 전 과정을 실질적으로 지원하기 위한 조직적 기반입니다.
@@ -623,21 +678,26 @@ ${toneIntro}
 
 감사합니다.`;
             } else if (purpose === 'app') {
-                result = `[제목] [안내] 기존 업무 정보 그대로! 더욱 편리해진 POUR 전용 앱 전환 안내
+                result = `[제목] [안내] 기존 데이터 100% 보존 · ${appName} 런칭
+
+[안심 안내] 기존 데이터 및 업무 내역 100% 보존 — 소중한 현장 정보는 '그대로' 유지됩니다.
 
 안녕하십니까, ${target}.
 ${toneIntro}
 
-당사의 서비스를 이용해 주시는 ${target}께 진심으로 감사드립니다. 
-금번 당사 전용 앱 개편과 관련하여 현장에서 느끼실 수 있는 번거로움과 염려를 최소화하고자 사전 안내를 드립니다.
+${feedbackIntro}
+그 마음을 담아 '고객사만을 위한' ${appName} 런칭을 안내드립니다.
 
-1. 기존 데이터 및 업무 내역 100% 보존
-- 기존에 등록하여 관리하시던 현장 정보, 문서, 기존 데이터는 손실 없이 그대로 신규 앱으로 연동됩니다.
+1. 기존 정보는 '그대로'
+- 기존에 등록하신 현장 정보, 문서 및 업무 내역은 손실 없이 100% 보존되어 연동됩니다.
+- 사용하시던 계정도 '그대로', 번거로운 재등록 없이 업무를 이어가실 수 있습니다.
 
-2. 익숙한 업무 환경 유지 및 편의성 강화
-- 번거로운 재등록 과정 없이 사용하시던 계정 그대로 접속하여 사용하실 수 있으며, 현장 확인 프로세스 단축을 통해 업무 효율성을 높였습니다.
+2. 현장 업무는 '더 편리하게'
+- 익숙한 업무 흐름을 유지하면서 현장 정보와 문서를 '더 편리하게' 확인하실 수 있도록 준비했습니다.
+${context ? '\n[고객사 맞춤 안내]\n' + context + '\n' : ''}
+[기억하실 한 문장] 소중한 기록은 '그대로', 매일의 업무는 '더 편리하게'.
 
-새로운 앱 설치 및 사용 과정에서 불편함이 없으시도록 최선을 다해 밀착 지원하겠습니다. 
+앱 설치와 이용 과정에서도 현장에 맞춰 밀착 지원하겠습니다. 사용 중 느끼시는 의견을 편하게 전해 주십시오.
 
 감사합니다.`;
             } else if (purpose === 'delay') {
@@ -663,7 +723,9 @@ ${toneIntro}
 안녕하십니까, ${target}.
 ${toneIntro}
 
-보내주신 요청 사항에 대해 당사 내부적으로 깊이 있게 검토를 진행하였습니다.
+${feedbackIntro}
+
+보내주신 요청 사항을 검토한 결과와 대안을 안내드립니다.
 
 현장의 고충과 현실적인 어려움에 대해 당사 역시 충분히 공감하고 있으나, 현행 계약 조건 및 예산 가이드라인상 요청해주신 사항을 원안 그대로 수용하기에는 객관적인 한계가 있음을 정중히 양해 부탁드립니다.
 
@@ -682,6 +744,8 @@ ${toneIntro}
 안녕하십니까, ${target}.
 ${toneIntro}
 
+${feedbackIntro}
+
 안건과 관련하여 아래와 같이 안내 및 협조 요청을 드립니다.
 
 1. 주요 내용
@@ -693,7 +757,7 @@ ${toneIntro}
 감사합니다.`;
             }
 
-            document.getElementById('mail-result-box').innerText = result;
+            renderMail(result);
             showToast('팀장님 결재 문구가 작성되었습니다.');
         }
 
@@ -776,7 +840,8 @@ ${action.split('\n').map(a => `· ${a}`).join('\n')}
 
         // Copy Handlers
         function copyMail() {
-            const text = document.getElementById('mail-result-box').innerText;
+            const box = document.getElementById('mail-result-box');
+            const text = box.dataset.plainText || box.innerText;
             copyText(text, 'btn-copy-mail-text', '복사하기');
         }
 
