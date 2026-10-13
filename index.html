@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팀장님 승인 전용 업무 문구 & 보고서 생성기</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Noto Sans KR -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+        }
+        /* Custom scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Print Optimized Styling */
+        @media print {
+            header, nav, .no-print, button, .toast-container, .download-banner {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0 !important;
+            }
+            main {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .print-container {
+                border: none !important;
+                box-shadow: none !important;
+                background: white !important;
+                padding: 0 !important;
+            }
+            .print-break-inside {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <!-- Navigation Header -->
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-col lg:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3 w-full lg:w-auto justify-between lg:justify-start">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-600 p-2.5 rounded-xl shadow-inner text-white flex items-center justify-center">
+                        <i class="fa-solid fa-stamp text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                            팀장님 승인 전용 문구 & 보고서 생성기
+                            <span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-mono">v3.5 DOWNLOAD</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">시공사 마음을 녹이는 문구 · 한눈에 보이는 요약 · 정식 보고서 자동 포맷</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Download KakaoTalk File Button -->
+            <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+                <button onclick="downloadSelfHTML()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-md transition flex items-center space-x-2 border border-amber-300 animate-pulse hover:animate-none">
+                    <i class="fa-solid fa-comment text-amber-900 text-base"></i>
+                    <span>📱 카톡 전달용 HTML 파일 다운로드 (.html)</span>
+                </button>
+            </div>
+
+            <!-- Main Nav Tabs -->
+            <nav class="flex bg-slate-800 p-1 rounded-xl border border-slate-700/60 w-full lg:w-auto justify-center">
+                <button id="tab-btn-mail" onclick="switchTab('mail')" class="flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                    <span>메일 문구</span>
+                </button>
+                <button id="tab-btn-briefing" onclick="switchTab('briefing')" class="flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-slate-300 hover:text-white flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                    <span>보고용 (1분 요약)</span>
+                </button>
+                <button id="tab-btn-report" onclick="switchTab('report')" class="flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-slate-300 hover:text-white flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>보고서 정리</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- KakaoTalk Download Info Banner -->
+    <aside class="no-print download-banner bg-amber-500/10 border-b border-amber-400/30 text-amber-900 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center space-x-2">
+                <span class="bg-amber-400 text-slate-900 font-bold px-2 py-0.5 rounded text-[10px] tracking-wide">💡 카톡 공유 팁</span>
+                <span class="text-slate-700">상단 <strong>'카톡 전달용 HTML 파일 다운로드'</strong> 버튼을 눌러 소장된 <strong>.html</strong> 파일을 카카오톡 나에게 보내기나 팀장님 채팅방에 파일로 첨부하세요!</span>
+            </div>
+            <div class="text-[11px] text-slate-500">
+                <i class="fa-solid fa-circle-info text-amber-600 mr-1"></i>설치 없이 스마트폰/PC 인터넷 브라우저에서 바로 실행됩니다.
+            </div>
+        </div>
+    </aside>
+
+    <!-- Global Guidelines Banner / Collapsible Rules -->
+    <aside class="no-print bg-indigo-950 text-indigo-100 border-b border-indigo-800/50 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center space-x-2">
+                <span class="bg-indigo-600 text-white font-bold px-2 py-0.5 rounded text-[10px] tracking-wide">팀장님 스타일 가이드</span>
+                <span class="text-slate-300 hidden sm:inline">논리 개연성 + 팩트 중심 + 시공사 배려 키워드가 자동으로 반영됩니다.</span>
+            </div>
+            <div class="flex items-center space-x-4 text-[11px] text-indigo-300">
+                <span title="60명 = 단순 규모 자랑이 아닌 지원 조직 기반"><i class="fa-solid fa-users text-indigo-400 mr-1"></i>60명 전문인력 = 지원 기반</span>
+                <span title="수주 보장 표현 원천 차단"><i class="fa-solid fa-ban text-red-400 mr-1"></i>수주보장 표현 금지</span>
+                <span title="앱 전환시 데이터 100% 보존 선제 강조"><i class="fa-solid fa-database text-emerald-400 mr-1"></i>앱 전환 데이터 100% 연동</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+
+        <!-- ================= TAB 1: 메일 문구 (Email Generator) ================= -->
+        <section id="view-mail" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Control Panel (5 Cols) -->
+                <div class="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h2 class="text-sm font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-sliders text-indigo-600 mr-2"></i> 메일 문구 설정
+                        </h2>
+                        <button onclick="loadSampleMailData()" class="no-print text-xs text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition font-medium">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> 예시 데이터 채우기
+                        </button>
+                    </div>
+
+                    <!-- Target Recipient -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">수신자 및 현장명</label>
+                        <input type="text" id="mail-target" placeholder="예: [OO건설] 신대방 현장 소장님" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                    </div>
+
+                    <!-- Purpose Selection -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">메일 목적</label>
+                        <select id="mail-purpose" onchange="handleMailPurposeChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                            <option value="pour">A. POUR 공법 제안 & 홍보 메일 (60명 지원 기반)</option>
+                            <option value="app">B. 앱 전환 안내 & 시공사 불안 해소 (데이터 유지)</option>
+                            <option value="delay">C. 공정 지연 안내 및 협조 요청</option>
+                            <option value="reject">D. 시공사 요구사항 부드러운 거절 및 대안 제시</option>
+                            <option value="general">E. 일반 협조 요청 및 공지 메일</option>
+                        </select>
+                    </div>
+
+                    <!-- Empathy Level Toggle -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">시공사 마음 헤아림 톤 (배려 수준)</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="setTone('basic')" id="tone-basic" class="tone-btn text-xs py-2 px-1 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium text-center transition">
+                                기본 (단정/명확)
+                            </button>
+                            <button type="button" onclick="setTone('caring')" id="tone-caring" class="tone-btn text-xs py-2 px-1 rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-700 font-bold text-center transition">
+                                깊은 배려 (추천)
+                            </button>
+                            <button type="button" onclick="setTone('polite')" id="tone-polite" class="tone-btn text-xs py-2 px-1 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium text-center transition">
+                                정중한 요청
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Core Context Input -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">전달하고 싶은 핵심 메모</label>
+                        <textarea id="mail-context" rows="5" placeholder="두서없이 입력하셔도 됩니다. 팀장님 결재용 문체로 정돈됩니다." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"></textarea>
+                    </div>
+
+                    <!-- Mode Info Alerts -->
+                    <div id="pour-alert" class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-800 space-y-1">
+                        <div class="font-bold flex items-center"><i class="fa-solid fa-shield-halved text-amber-600 mr-1.5"></i> 팀장님 필터링 자동 가동</div>
+                        <p>· 60명 전문인력 = 단순히 회사를 자랑하는 문구가 아닌, <strong>실제 지원 조직 기반</strong>으로 서술됩니다.</p>
+                        <p>· '수주 보장' 표현은 절대 사용하지 않으며 <strong>'영업 및 현장 적용 지원'</strong>으로 변환됩니다.</p>
+                    </div>
+
+                    <div id="app-alert" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-[11px] text-emerald-800 space-y-1">
+                        <div class="font-bold flex items-center"><i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i> 시공사 안심 필터 가동</div>
+                        <p>· 신기능 자랑보다 <strong>'기존 데이터 및 업무 내역 100% 보존 및 연동'</strong>을 상단에 먼저 배치합니다.</p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button onclick="generateMail()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition duration-200 flex items-center justify-center space-x-2 text-sm">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>팀장님 결재 프리패스 메일 생성</span>
+                    </button>
+                </div>
+
+                <!-- Right Display Panel (7 Cols) -->
+                <div class="lg:col-span-7 bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 flex flex-col justify-between min-h-[500px]">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <h2 class="text-sm font-bold text-slate-800 flex items-center">
+                                <i class="fa-solid fa-file-signature text-indigo-600 mr-2"></i> 작성된 이메일 결과물
+                            </h2>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="copyMail()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center space-x-1">
+                                    <i class="fa-regular fa-copy"></i>
+                                    <span id="btn-copy-mail-text">복사하기</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Mail Output Box -->
+                        <div id="mail-result-box" class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-800 whitespace-pre-wrap leading-relaxed min-h-[380px] max-h-[520px] overflow-y-auto font-sans">
+좌측 옵션을 설정한 후 [팀장님 결재 프리패스 메일 생성] 버튼을 눌러주세요.
+
+시공사 마음을 녹이는 문체와 팀장님의 까다로운 검증 기준이 적용된 이메일 본문이 생성됩니다.
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                        <span><i class="fa-solid fa-shield-check text-indigo-500 mr-1"></i> 두괄식 · 팩트 기반 · 비즈니스 표준 격식체</span>
+                        <span>Auto-Formatted for Email</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 2: 보고용 요약 (Briefing Generator) ================= -->
+        <section id="view-briefing" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Controls (5 Cols) -->
+                <div class="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h2 class="text-sm font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-bolt-lightning text-amber-500 mr-2"></i> 팀장님 1분 보고용 요약 설정
+                        </h2>
+                        <button onclick="loadSampleBriefingData()" class="no-print text-xs text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition font-medium">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> 예시 입력
+                        </button>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">보고 제목 / 안건</label>
+                        <input type="text" id="briefing-title" placeholder="예: 시공사 앱 전환 문의 대응 및 현장 지원 건" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">현재 상태 / 이슈 메모</label>
+                        <textarea id="briefing-status" rows="4" placeholder="어떤 상황인지 핵심 사건 위주로 메모해 주세요." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">조치 계획 및 필요 사항 (승인 요청 내용)</label>
+                        <textarea id="briefing-action" rows="4" placeholder="어떻게 해결할 것인지, 팀장님의 승인이나 결정이 필요한 사항을 입력해 주세요." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"></textarea>
+                    </div>
+
+                    <button onclick="generateBriefing()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition duration-200 flex items-center justify-center space-x-2 text-sm">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>1분 보고용 요약 생성</span>
+                    </button>
+                </div>
+
+                <!-- Display (7 Cols) -->
+                <div class="lg:col-span-7 bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 flex flex-col justify-between min-h-[500px]">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <h2 class="text-sm font-bold text-slate-800 flex items-center">
+                                <i class="fa-solid fa-clipboard-check text-amber-600 mr-2"></i> 두괄식 보고용 브리핑
+                            </h2>
+                            <button onclick="copyBriefing()" class="bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center space-x-1">
+                                <i class="fa-regular fa-copy"></i>
+                                <span id="btn-copy-briefing-text">요약 복사</span>
+                            </button>
+                        </div>
+
+                        <!-- Result Display Box -->
+                        <div id="briefing-result-box" class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-800 whitespace-pre-wrap leading-relaxed min-h-[380px] max-h-[520px] overflow-y-auto font-sans">
+[보고용 요약 양식 예시]
+
+■ 핵심 요약 (1줄)
+: 시공사의 앱 전환 관련 데이터 손실 우려 해소를 위해 '기존 정보 100% 보존' 강조 공문 발송 및 현장 밀착 케어 진행 예정.
+
+■ 현황 및 주요 이슈
+- 신규 앱 전환 시 기존 업무 내역이 삭제될 것을 우려하는 문의 다수 발생.
+- 현장의 번거로움을 줄여주는 설명이 우선되어야 함.
+
+■ 대응 조치 및 계획
+1. '기존 아이디 및 데이터 100% 연동' 명시된 카드뉴스 배포
+2. 주요 10개 현장 소장님 대상 전화 사전 안내 실시
+
+■ 승인 요청 사항
+- [결재 요청] 시공사 맞춤형 안내문 정식 발송 승인의 건
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                        <span><i class="fa-solid fa-bullseye text-amber-500 mr-1"></i> 결론부터 제시하는 두괄식 1분 보고 포맷</span>
+                        <span>Executive Briefing Mode</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 3: 보고서 정리 (Formal Report Generator) ================= -->
+        <section id="view-report" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Input Section (5 Cols) -->
+                <div class="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 space-y-4 no-print">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h2 class="text-sm font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-file-pen text-indigo-600 mr-2"></i> 주간 회의 / 현장 메모 입력
+                        </h2>
+                        <button onclick="loadSampleReportData()" class="text-xs text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition font-medium">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> 예시 회의록 채우기
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">회의 / 보고서 명</label>
+                            <input type="text" id="report-title" value="주간 현장 소통 및 POUR 공법 지원 회의" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">일자 및 작성자</label>
+                            <input type="text" id="report-meta" value="2026-10-13 / 공정관리팀" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">회의 raw 메모 (두서없이 입력 가능)</label>
+                        <textarea id="report-raw" rows="10" placeholder="회의 중 나온 메모나 자유 양식의 텍스트를 복사해서 넣어주세요." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"></textarea>
+                    </div>
+
+                    <button onclick="generateReport()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition duration-200 flex items-center justify-center space-x-2 text-sm">
+                        <i class="fa-solid fa-file-arrow-up"></i>
+                        <span>정식 보고서 포맷으로 구조화</span>
+                    </button>
+                </div>
+
+                <!-- Output Display Section (7 Cols / Printable) -->
+                <div class="lg:col-span-7 bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80 flex flex-col justify-between print-container">
+                    <div class="space-y-6">
+                        <!-- Top Action Controls for Report -->
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-4 no-print">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs bg-slate-100 text-slate-700 font-bold px-2.5 py-1 rounded-md">출력 및 복사 최적화</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="copyReportText()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center space-x-1">
+                                    <i class="fa-regular fa-copy"></i>
+                                    <span id="btn-copy-report-text">텍스트 복사</span>
+                                </button>
+                                <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center space-x-1 shadow-sm">
+                                    <i class="fa-solid fa-print"></i>
+                                    <span>보고서 인쇄 / PDF</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Rendered Document View -->
+                        <div id="report-document-render" class="space-y-6 text-slate-800 text-sm">
+                            <div class="text-center border-b-2 border-slate-900 pb-4">
+                                <h1 id="doc-title" class="text-2xl font-bold text-slate-900 tracking-tight">주간 현장 소통 및 POUR 공법 지원 회의</h1>
+                                <p id="doc-meta" class="text-xs text-slate-500 mt-2">일시 및 작성: 2026-10-13 / 공정관리팀</p>
+                            </div>
+
+                            <!-- Executive Summary -->
+                            <div class="space-y-2">
+                                <h3 class="text-xs font-bold text-indigo-900 uppercase tracking-wider bg-indigo-50 border-l-4 border-indigo-600 px-3 py-1.5">1. Executive Summary (핵심 요약)</h3>
+                                <p id="doc-summary" class="text-slate-700 leading-relaxed pl-1">
+                                    시공사와의 상생 및 업무 효율화를 위한 POUR 공법 제안 논리 강화 및 신규 앱 전환에 따른 현장 불안 해소 방안을 정립함.
+                                </p>
+                            </div>
+
+                            <!-- Key Discussions -->
+                            <div class="space-y-2">
+                                <h3 class="text-xs font-bold text-indigo-900 uppercase tracking-wider bg-indigo-50 border-l-4 border-indigo-600 px-3 py-1.5">2. 주요 논의 및 결정 사항</h3>
+                                <ul id="doc-discussions" class="list-disc list-inside space-y-1 text-slate-700 pl-2 leading-relaxed">
+                                    <li><strong>POUR 공법 지원 체계:</strong> 단순 60명 인력 홍보를 넘어 60명의 전문 인력이 기술검토-컨설팅-현장적용을 밀착 케어한다는 조직적 기반 강조.</li>
+                                    <li><strong>앱 전환 안내:</strong> 시공사의 재적응 및 데이터 손실 우려를 불식시키기 위해 '기존 정보 100% 보존'을 안내문 최상단에 배치.</li>
+                                    <li><strong>수주 보장 표현 배제:</strong> '수주 보장'과 같은 자극적 문구를 배제하고 '실질적 영업 및 현장 지원'으로 명확히 구분.</li>
+                                </ul>
+                            </div>
+
+                            <!-- Action Items Table -->
+                            <div class="space-y-2 print-break-inside">
+                                <h3 class="text-xs font-bold text-indigo-900 uppercase tracking-wider bg-indigo-50 border-l-4 border-indigo-600 px-3 py-1.5">3. Action Items (실행 과제)</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-xs text-left text-slate-700 border-collapse border border-slate-200">
+                                        <thead class="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
+                                            <tr>
+                                                <th class="p-2 border border-slate-200 w-12 text-center">NO</th>
+                                                <th class="p-2 border border-slate-200">실행 과제 및 세부 내용</th>
+                                                <th class="p-2 border border-slate-200 w-24 text-center">담당자</th>
+                                                <th class="p-2 border border-slate-200 w-28 text-center">기한</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="doc-action-items">
+                                            <tr class="border-b border-slate-200">
+                                                <td class="p-2 border border-slate-200 text-center font-mono">1</td>
+                                                <td class="p-2 border border-slate-200">시공사 맞춤형 앱 전환 안내 카드뉴스 작성</td>
+                                                <td class="p-2 border border-slate-200 text-center">홍길동 대리</td>
+                                                <td class="p-2 border border-slate-200 text-center">10/16 (금)</td>
+                                            </tr>
+                                            <tr class="border-b border-slate-200">
+                                                <td class="p-2 border border-slate-200 text-center font-mono">2</td>
+                                                <td class="p-2 border border-slate-200">POUR 공법 지원 조직(60명) 소구 제안서 재정돈</td>
+                                                <td class="p-2 border border-slate-200 text-center">김철수 과장</td>
+                                                <td class="p-2 border border-slate-200 text-center">10/19 (월)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Notes -->
+                            <div class="space-y-2">
+                                <h3 class="text-xs font-bold text-indigo-900 uppercase tracking-wider bg-indigo-50 border-l-4 border-indigo-600 px-3 py-1.5">4. 특이사항 및 현장 공유 내용</h3>
+                                <p id="doc-notes" class="text-slate-600 text-xs leading-relaxed pl-1">
+                                    팀장님 지시 사항에 따라 수주 보장성 멘트는 일절 삭제 처리하였으며, 차주 회의 시 시공사 반응 및 피드백을 추가 보고 예정임.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 mt-6 border-t border-slate-200 text-center text-xs text-slate-400 no-print">
+                        팀장님 결재 및 승인 완결용 표준 서식입니다. (인쇄 또는 PDF 저장 지원)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toast" class="no-print fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl opacity-0 pointer-events-none transition-all duration-300 flex items-center space-x-2 z-50">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-message">클립보드에 복사되었습니다!</span>
+    </div>
+
+    <!-- Application JavaScript Engine -->
+    <script>
+        // State variables
+        let activeTone = 'caring';
+
+        // Direct HTML File Self-Download Engine
+        function downloadSelfHTML() {
+            try {
+                const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'team_leader_pass_tool.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('파일이 다운로드 되었습니다! 카톡에 첨부해보세요.');
+            } catch (err) {
+                alert('파일 다운로드 중 오류가 발생하였습니다.');
+            }
+        }
+
+        // Tab Switching Engine
+        function switchTab(tabId) {
+            const tabs = ['mail', 'briefing', 'report'];
+            tabs.forEach(t => {
+                const view = document.getElementById(`view-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabId) {
+                    view.classList.remove('hidden');
+                    btn.className = "flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white shadow-md flex items-center justify-center space-x-2";
+                } else {
+                    view.classList.add('hidden');
+                    btn.className = "flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-slate-300 hover:text-white flex items-center justify-center space-x-2";
+                }
+            });
+        }
+
+        // Set Tone in Tab 1
+        function setTone(tone) {
+            activeTone = tone;
+            const buttons = ['basic', 'caring', 'polite'];
+            buttons.forEach(b => {
+                const btn = document.getElementById(`tone-${b}`);
+                if (b === tone) {
+                    btn.className = "tone-btn text-xs py-2 px-1 rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-700 font-bold text-center transition";
+                } else {
+                    btn.className = "tone-btn text-xs py-2 px-1 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium text-center transition";
+                }
+            });
+        }
+
+        // Toggle alerts based on purpose select
+        function handleMailPurposeChange() {
+            const purpose = document.getElementById('mail-purpose').value;
+            const pourAlert = document.getElementById('pour-alert');
+            const appAlert = document.getElementById('app-alert');
+
+            if (purpose === 'pour') {
+                pourAlert.classList.remove('hidden');
+                appAlert.classList.add('hidden');
+            } else if (purpose === 'app') {
+                pourAlert.classList.add('hidden');
+                appAlert.classList.remove('hidden');
+            } else {
+                pourAlert.classList.add('hidden');
+                appAlert.classList.add('hidden');
+            }
+        }
+
+        // Show Toast Notification
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+
+        // Copy Helper
+        function copyText(text, btnId, defaultText) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('클립보드에 복사되었습니다.');
+                if (btnId) {
+                    const btnSpan = document.getElementById(btnId);
+                    if (btnSpan) {
+                        btnSpan.innerText = '복사 완료!';
+                        setTimeout(() => { btnSpan.innerText = defaultText; }, 2000);
+                    }
+                }
+            } catch (err) {
+                alert('복사 중 오류가 발생했습니다.');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // Sample Data Loaders
+        function loadSampleMailData() {
+            document.getElementById('mail-target').value = "[OO건설] 신대방 현장 소장님 및 관계자 귀하";
+            document.getElementById('mail-purpose').value = "pour";
+            document.getElementById('mail-context').value = "이번 제안서 작성 건으로 메일 보냄. 60명 전문인력이 있다는 것 강조해주고 단순 특허 자랑 말고 공법설명회, 컨설팅, 현장 밀착지원 가능한 시스템이라는 점 필력할 것. 수주 보장 문구는 빼야 함.";
+            setTone('caring');
+            handleMailPurposeChange();
+            showToast('샘플 메일 데이터가 채워졌습니다.');
+        }
+
+        function loadSampleBriefingData() {
+            document.getElementById('briefing-title').value = "시공사 대상 앱 전환 안내 및 현장 지원 대책 보고";
+            document.getElementById('briefing-status').value = "신규 전용 앱 출시 예정이나, 기존 시공사에서 데이터 삭제 및 재적응 부담에 대한 우려 문의 15건 접수됨.";
+            document.getElementById('briefing-action').value = "1. '기존 현장 정보 100% 연동'을 명시한 카드뉴스 배포\n2. 주요 현장 대상 1:1 전화 안내 실시\n[승인 요청] 시공사 협조 공문 정식 발송의 건";
+            showToast('샘플 보고용 데이터가 채워졌습니다.');
+        }
+
+        function loadSampleReportData() {
+            document.getElementById('report-title').value = "주간 현장 소통 및 POUR 공법 지원 회의";
+            document.getElementById('report-meta').value = "2026-10-13 / 공정관리팀";
+            document.getElementById('report-raw').value = `김 대리: 시공사에서 앱 바꾸면 기존 문서 날아가는 거 아니냐고 문의 많았음.
+박 과장: 안내문 만들 때 신기능 자랑보다 기존 데이터 다 연동된다는 점을 상단에 박기로 결정.
+팀장 지시: POUR 공법 60명 자랑할 때 단순 숫자가 아니라 기술검토랑 현장지원 프로세스 조직력으로 풀어 쓸 것. 수주 보장이라는 위험한 멘트는 다 빼라.
+액션 아이템:
+- 앱 전환 카드뉴스 제작 (담당: 홍길동, 기한: 10/16)
+- 제안서 POUR 문구 재정리 (담당: 김철수, 기한: 10/19)`;
+            showToast('샘플 회의록 데이터가 채워졌습니다.');
+        }
+
+        // Tab 1: Generate Email Logic
+        function generateMail() {
+            const target = document.getElementById('mail-target').value || '현장 소장님 및 관계자 귀하';
+            const purpose = document.getElementById('mail-purpose').value;
+            const context = document.getElementById('mail-context').value.trim();
+
+            let toneIntro = "언제나 현장에서 최선을 다해 주시는 노고에 깊은 감사드립니다.";
+            if (activeTone === 'caring') {
+                toneIntro = "현장의 고된 업무 속에서도 완벽한 시공을 위해 애써주시는 노고에 진심으로 감사드립니다. 현장의 안전과 원활한 진행을 늘 응원합니다.";
+            } else if (activeTone === 'polite') {
+                toneIntro = "평소 당사 업무에 적극적으로 협조해 주심에 깊은 감사의 말씀을 전합니다.";
+            }
+
+            let result = "";
+
+            if (purpose === 'pour') {
+                result = `[제목] [안내] 성공적인 현장 완성을 위한 POUR 공법 및 체계적 지원 시스템 안내의 건
+
+안녕하십니까, ${target}.
+${toneIntro}
+
+금번 당사의 POUR 공법과 관련하여, 단순한 공법 제공을 넘어 현장의 성공적인 적용을 돕는 당사의 체계적인 지원 시스템을 안내해 드리고자 합니다.
+
+1. 분야별 전문 인력(60명) 기반의 지원 체계
+- 당사의 60명 전문 인력 조직은 단순 규모 확장이 아닌, 기술 검토부터 공법설명회, 맞춤형 컨설팅 및 현장 적용에 이르기까지 전 과정을 실질적으로 지원하기 위한 조직적 기반입니다.
+
+2. 현장 맞춤형 밀착 케어 프로세스
+- [공법설명회 & 컨설팅]: 현장 여건을 사전 분석하여 최적화된 공법 가이드를 제공합니다.
+- [영업 및 현장 지원]: 사업 추진 과정에서의 기술적 타당성 검토와 현장 시공 시의 시행착오를 최소화합니다.
+
+당사는 단순한 공법 공급에 머무르지 않고, ${target}의 현장이 차질 없이 완수될 수 있도록 기술적·조직적 지원에 최선을 다할 것을 약속드립니다.
+
+관련하여 추가적인 기술 검토나 설명회가 필요하신 경우 언제든 편하게 말씀해 주십시오.
+
+감사합니다.`;
+            } else if (purpose === 'app') {
+                result = `[제목] [안내] 기존 업무 정보 그대로! 더욱 편리해진 POUR 전용 앱 전환 안내
+
+안녕하십니까, ${target}.
+${toneIntro}
+
+당사의 서비스를 이용해 주시는 ${target}께 진심으로 감사드립니다. 
+금번 당사 전용 앱 개편과 관련하여 현장에서 느끼실 수 있는 번거로움과 염려를 최소화하고자 사전 안내를 드립니다.
+
+1. 기존 데이터 및 업무 내역 100% 보존
+- 기존에 등록하여 관리하시던 현장 정보, 문서, 기존 데이터는 손실 없이 그대로 신규 앱으로 연동됩니다.
+
+2. 익숙한 업무 환경 유지 및 편의성 강화
+- 번거로운 재등록 과정 없이 사용하시던 계정 그대로 접속하여 사용하실 수 있으며, 현장 확인 프로세스 단축을 통해 업무 효율성을 높였습니다.
+
+새로운 앱 설치 및 사용 과정에서 불편함이 없으시도록 최선을 다해 밀착 지원하겠습니다. 
+
+감사합니다.`;
+            } else if (purpose === 'delay') {
+                result = `[제목] [협조] 현장 공정 일정 조정에 따른 양해 및 협조 요청의 건
+
+안녕하십니까, ${target}.
+${toneIntro}
+
+다름이 아니오라, 현장 여건 및 불가피한 제반 상황 변동으로 인하여 일부 공정 일정의 조정이 발생하게 되어 양해의 말씀을 올립니다.
+
+1. 주요 현황 및 사유
+- ${context || '현장 기상 여건 및 자재 수급 일정 소폭 변동'}
+
+2. 만회 대책 및 조치 계획
+- 당사는 전체 준공 일정에 차질이 없도록 가속 운전 및 인력 추가 투입 등 다각도의 만회 대책을 강구하여 실행 중에 있습니다.
+
+현장의 어려움을 누구보다 잘 알고 있기에 송구스러운 마음을 전하며, ${target}과의 긴밀한 소통을 통해 차질 없이 완수될 수 있도록 만전을 기하겠습니다.
+
+감사합니다.`;
+            } else if (purpose === 'reject') {
+                result = `[제목] [검토 회신] 시공사 요청 사항에 대한 내부 검토 의견 회신의 건
+
+안녕하십니까, ${target}.
+${toneIntro}
+
+보내주신 요청 사항에 대해 당사 내부적으로 깊이 있게 검토를 진행하였습니다.
+
+현장의 고충과 현실적인 어려움에 대해 당사 역시 충분히 공감하고 있으나, 현행 계약 조건 및 예산 가이드라인상 요청해주신 사항을 원안 그대로 수용하기에는 객관적인 한계가 있음을 정중히 양해 부탁드립니다.
+
+1. 검토 결과
+- ${context || '원안 직접 반영은 어려우나 대안적 지원 방안 검토 중'}
+
+2. 당사 대안 제시 및 협의 제안
+- 현장의 부담을 줄일 수 있는 기술적 대안 및 단계적 지원 방안을 모색하였습니다. 세부 사항에 대해서는 빠른 시일 내 방문하여 상의드리겠습니다.
+
+상생의 자세로 현장의 문제를 함께 해결할 수 있도록 최선을 다하겠습니다.
+
+감사합니다.`;
+            } else {
+                result = `[제목] [안내] 업무 협조 및 공지 사항의 건
+
+안녕하십니까, ${target}.
+${toneIntro}
+
+안건과 관련하여 아래와 같이 안내 및 협조 요청을 드립니다.
+
+1. 주요 내용
+- ${context || '협조 요청 핵심 내용 입력'}
+
+2. 요청 사항
+- 현장 업무에 차질이 없으시도록 적극적인 확인 및 협조를 부탁드립니다.
+
+감사합니다.`;
+            }
+
+            document.getElementById('mail-result-box').innerText = result;
+            showToast('팀장님 결재 문구가 작성되었습니다.');
+        }
+
+        // Tab 2: Generate Briefing Logic
+        function generateBriefing() {
+            const title = document.getElementById('briefing-title').value || '업무 및 현장 대응 보고';
+            const status = document.getElementById('briefing-status').value || '특이 이슈 없음';
+            const action = document.getElementById('briefing-action').value || '계획대로 진행 예정';
+
+            const briefing = `[팀장님 1분 보고용 요약]
+
+■ 보고 제목: ${title}
+
+■ 핵심 요약 (1줄)
+: ${status.split('\n')[0]}
+
+■ 현황 및 주요 이슈
+${status.split('\n').map(s => `- ${s}`).join('\n')}
+
+■ 조치 계획 및 승인 요청 사항
+${action.split('\n').map(a => `· ${a}`).join('\n')}
+
+--------------------------------------------------
+* 두괄식 개조식 포맷 적용 완료 (보고 전 최종 확인 권장)`;
+
+            document.getElementById('briefing-result-box').innerText = briefing;
+            showToast('1분 보고용 요약이 생성되었습니다.');
+        }
+
+        // Tab 3: Generate Formal Report Logic
+        function generateReport() {
+            const title = document.getElementById('report-title').value || '주간 업무 회의 보고서';
+            const meta = document.getElementById('report-meta').value || '2026-10-13 / 공정관리팀';
+            const raw = document.getElementById('report-raw').value.trim();
+
+            document.getElementById('doc-title').innerText = title;
+            document.getElementById('doc-meta').innerText = `일시 및 작성: ${meta}`;
+
+            if (raw) {
+                const lines = raw.split('\n').filter(l => l.trim().length > 0);
+                
+                // Set Executive Summary
+                document.getElementById('doc-summary').innerText = lines[0] || "주간 업무 진행 현황 및 시공사 지원 대책 수립 건.";
+
+                // Discussions
+                const discussionsList = document.getElementById('doc-discussions');
+                discussionsList.innerHTML = '';
+                const discItems = lines.slice(1, 4);
+                if (discItems.length === 0) {
+                    discItems.push("주요 안건 및 현장 소통 방안 논의 완료.");
+                }
+                discItems.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${item.split(':')[0] || '안건'}:</strong> ${item.split(':')[1] || item}`;
+                    discussionsList.appendChild(li);
+                });
+
+                // Action Items
+                const actionTbody = document.getElementById('doc-action-items');
+                actionTbody.innerHTML = `
+                    <tr class="border-b border-slate-200">
+                        <td class="p-2 border border-slate-200 text-center font-mono">1</td>
+                        <td class="p-2 border border-slate-200">${lines[4] || '시공사 지원 안내문 작성 및 검토'}</td>
+                        <td class="p-2 border border-slate-200 text-center">담당자</td>
+                        <td class="p-2 border border-slate-200 text-center">금주 내</td>
+                    </tr>
+                    <tr class="border-b border-slate-200">
+                        <td class="p-2 border border-slate-200 text-center font-mono">2</td>
+                        <td class="p-2 border border-slate-200">${lines[5] || '팀장님 승인 후 공문 정식 발송'}</td>
+                        <td class="p-2 border border-slate-200 text-center">공정팀</td>
+                        <td class="p-2 border border-slate-200 text-center">차주 초</td>
+                    </tr>
+                `;
+
+                document.getElementById('doc-notes').innerText = lines.slice(6).join(' ') || "특이사항 없으며 차주 경과 보고 예정.";
+            }
+
+            showToast('보고서 양식으로 정돈되었습니다.');
+        }
+
+        // Copy Handlers
+        function copyMail() {
+            const text = document.getElementById('mail-result-box').innerText;
+            copyText(text, 'btn-copy-mail-text', '복사하기');
+        }
+
+        function copyBriefing() {
+            const text = document.getElementById('briefing-result-box').innerText;
+            copyText(text, 'btn-copy-briefing-text', '요약 복사');
+        }
+
+        function copyReportText() {
+            const title = document.getElementById('doc-title').innerText;
+            const meta = document.getElementById('doc-meta').innerText;
+            const summary = document.getElementById('doc-summary').innerText;
+            const discussions = document.getElementById('doc-discussions').innerText;
+            const notes = document.getElementById('doc-notes').innerText;
+
+            const fullText = `[${title}]\n${meta}\n\n1. Executive Summary\n${summary}\n\n2. 주요 논의 사항\n${discussions}\n\n3. 특이사항\n${notes}`;
+            copyText(fullText, 'btn-copy-report-text', '텍스트 복사');
+        }
+    </script>
+</body>
+</html>
